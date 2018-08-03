@@ -53,3 +53,4 @@ for step in range(201):  #训练200次
     sess.run(train)         #进行训练
     if step % 20 == 0:      #每20次输出一个weights和biases状态
         print(step, sess.run(Weights), sess.run(biases),sess.run(y),y_data,sess.run(loss))
+
