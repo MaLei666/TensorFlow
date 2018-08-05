@@ -11,7 +11,7 @@ def add_layer(input,in_size,out_size,activation_function=None):
     biases=tf.Variable(tf.zeros([1,out_size])+0.1)
     # tf.matmul()是矩阵的乘法
     out_pre=tf.matmul(input,weights)+biases
-    # 当activation_function——激励函数为None时，输出就是当前的预测值——Wx_plus_b
+    # 当activation_function——激励函数为None时，输出就是当前的预测值
     if activation_function is None:
         outputs=out_pre
     # 不为None时，就把Wx_plus_b传到activation_function()函数中得到输出
@@ -39,9 +39,8 @@ loss=tf.reduce_mean(tf.reduce_sum(tf.square(ys-prediction),reduction_indices=[1]
 # 梯度下降法调优
 train_step=tf.train.GradientDescentOptimizer(0.1).minimize(loss)
 # 变量初始化
-init=tf.global_variables_initializer()
 sess=tf.Session()
-sess.run(init)
+sess.run(tf.global_variables_initializer())
 
 # 散点图描述真实数据
 fig = plt.figure()
