@@ -47,7 +47,7 @@ x_image=tf.reshape(xs,[-1,28,28,1])
 
 # 建立卷积层
 # 定义第一层卷积
-# 定义weight，选择卷积核patch大小是5x5，黑白图片channel是1，输出是32个featuremap
+# 定义weight，选择卷积核patch大小是5x5，黑白图片channel是1，输出是32个featuremap（即使用了32个卷积核）
 w_conv1=weight_variable([5,5,1,32])
 # 定义bias，大小是32个长度
 b_conv1=bias_variable([32])
@@ -66,6 +66,7 @@ h_conv2=tf.nn.relu(conv2d(h_pool1,w_conv2)+b_conv2)
 # pooling处理后输出变为7*7*64
 h_pool2=max_pool(h_conv2)
 
+# 建立全连接层
 # 建立全连接层1
 # 将h_pool2通过reshape从三维变成一维数据
 # -1表示先不考虑输入图片例子维度, 将结果展平
@@ -89,7 +90,9 @@ prediction=tf.nn.softmax(tf.matmul(h_fc1_drop,w_fc2)+b_fc2)
 # 优化
 # loss函数选用交叉熵函数。交叉熵用来衡量预测值和真实值的相似程度，如果完全相同，交叉熵就等于零
 cross_entropy=tf.reduce_mean(-tf.reduce_sum(ys*tf.log(prediction),reduction_indices=[1]))
+# 用tf.train.AdamOptimizer()作为优化器进行优化
 train_step=tf.train.AdamOptimizer(1e-4).minimize(cross_entropy)
+
 # 变量初始化
 sess=tf.Session()
 sess.run(tf.global_variables_initializer())
@@ -100,5 +103,8 @@ sess.run(tf.global_variables_initializer())
 for i in range(1000):
     batch_xs,batch_ys=mnist.train.next_batch(100)
     sess.run(train_step,feed_dict={xs:batch_xs,ys:batch_ys,keep_prob:0.5})
-    if i%50==0:
+    if i%0==0:
         print(compute_accuracy(mnist.test.images[:1000], mnist.test.labels[:1000]))
+
+
+
