@@ -69,8 +69,8 @@ sess.run(tf.global_variables_initializer())
 # 机器学习的内容是train_step，用session来run每次training的数据
 # 当运算要用到placeholder时，就需要feed_dict这个字典来指定输入。
 for i in range(500):  #500次训练
-    sess.run(train_step,feed_dict={xs:x_train,ys:y_train,keep_prob:1})
-    # sess.run(train_step, feed_dict={xs: x_train, ys: y_train, keep_prob: 0.5})
+    # sess.run(train_step,feed_dict={xs:x_train,ys:y_train,keep_prob:1})
+    sess.run(train_step, feed_dict={xs: x_train, ys: y_train, keep_prob: 0.5})
     if i%50==0:
         # merged 也需要run 才能发挥作用
         train_result = sess.run(merged, feed_dict={xs: x_train, ys: y_train, keep_prob: 1})
