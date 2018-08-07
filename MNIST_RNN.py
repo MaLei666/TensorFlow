@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+8# -*- coding: utf-8 -*-
 import tensorflow as tf
 from tensorflow.examples.tutorials.mnist import input_data
 import numpy as np
@@ -19,16 +19,18 @@ mnist=input_data.read_data_sets('MNIST_data',one_hot=True)
 test_x=mnist.test.images[:2000]
 test_y=mnist.test.labels[:2000]
 
-print(mnist.train.images.shape)
-print(mnist.train.labels.shape)
-plt.imshow(mnist.train.images[0].reshape((28,28)),cmap='gray')
-plt.title('%i'%np.argmax(mnist.train.labels[0]))
-plt.show()
+# matplotlib显示一个图片
+# print(mnist.train.images.shape) #(55000,28*28)
+# print(mnist.train.labels.shape) #(55000,10)
+# plt.imshow(mnist.train.images[10].reshape((28,28)),cmap='gray')
+# plt.title('%i'%np.argmax(mnist.train.labels[10]))
+# plt.show()
 
-tf_x=tf.placeholder(tf.float32,[None,time_steps*inputs_size])
-image=tf.reshape(tf_x,[-1,time_steps,inputs_size])
+# 设置TensorFlow占位符
+tf_x=tf.placeholder(tf.float32,[None,time_steps*inputs_size]) #shape（batch，784）
+image=tf.reshape(tf_x,[-1,time_steps,inputs_size])  #（batch,height,width,channel）
 tf_y=tf.placeholder(tf.int32,[None,10])
-
+# 定义rnn主体结构
 # cell计算
 # 对于 lstm 来说, state可被分为(c_state, h_state)
 cell=tf.contrib.rnn.BasicLSTMCell(num_units=64)
@@ -37,7 +39,13 @@ init_state=cell.zero_state(batch_size,dtype=tf.float32)
 
 # 使用tf.nn.dynamic_rnn(cell, inputs), 要确定 inputs 的格式.
 # 函数中的 time_major 参数会针对不同 inputs 格式有不同的值.
-outputs,(h_c,h_n)=tf.nn.dynamic_rnn(cell,image,initial_state=None,dtype=tf.float32, time_major=False)
+outputs,(h_c,h_n)=tf.nn.dynamic_rnn(
+    cell,            #选择的cell
+    image,           # 输入
+    initial_state=None,  #初始隐含层
+    dtype=tf.float32,   # 如果隐含层设置为none，必须给dtype一个值
+    time_major=False # False: (batch, time step, input); True: (time step, batch, input)
+)
 
 output=tf.layers.dense(outputs[:,-1,:],10)
 
