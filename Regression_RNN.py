@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
-# -*- coding: utf-8 -*-
+'''
+使用自己创建的 sin 曲线预测一条 cos 曲线
+'''
 import tensorflow as tf
 import numpy as np
 import matplotlib.pyplot as plt
@@ -9,9 +11,9 @@ np.random.seed(1)
 
 # 参数定义
 lr=0.02                 # 学习率
-cell_size=32            # rnn cell size
-inputs_size=1           # rnn 输入
-time_steps=10           # 数据高度
+cell_size=32            # rnn 隐含层 size
+inputs_size=1           # rnn 输入 sin
+time_steps=10           #
 
 # 生成数据
 # 在指定的间隔[start,stop]内返回均匀间隔的数字。
@@ -65,21 +67,21 @@ plt.ion()
 
 for step in range(60):
     start,end=step*np.pi,(step+1)*np.pi
-
     steps=np.linspace(start,end,time_steps)
     x=np.sin(steps)[np.newaxis,:,np.newaxis]
     y=np.cos(steps)[np.newaxis,:,np.newaxis]
-    if 'final_s' not in globals():
+
+    if 'final_s_' not in globals():
         feed_dict={tf_x:x,tf_y:y}
     else:
-        feed_dict={tf_x:x,tf_y:y,init_state:final_s}
+        feed_dict={tf_x:x,tf_y:y,init_state:final_s_}
 
     _,pred_,final_s_=sess.run([train_op,out,final_s],feed_dict)
-    plt.plot(steps.flatten(),'r-')
+    plt.plot(steps,y.flatten(),'r-')
     plt.plot(steps,pred_.flatten(),'b-')
     plt.ylim(-1.2,1.2)
     plt.draw()
-    plt.pause(0.5)
+    plt.pause(0.05)
 plt.ioff()
 plt.show()
 
