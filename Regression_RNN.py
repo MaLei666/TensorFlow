@@ -6,6 +6,7 @@ import tensorflow as tf
 import numpy as np
 import matplotlib.pyplot as plt
 
+# 设置图级随机种子，不同Session中的random系列函数表现出相对协同的特征
 tf.set_random_seed(1)
 np.random.seed(1)
 
@@ -50,7 +51,7 @@ outputs,final_s=tf.nn.dynamic_rnn(  # 输出output和state(最后的状态)
 # 给定tensor，返回tensor与形状具有相同值的张量shape
 # -1使得计算该维度的大小，以使总大小保持不变
 out2d=tf.reshape(outputs,[-1,cell_size])   # tensor=outputs，shape=[-1,cell_size]
-# 输出与units大小相同张量
+# dense:全连接层，添加一个层
 net_out2d=tf.layers.dense(out2d,inputs_size)    # 张量输入=out2d，输出空间维数=inputs_size
 out=tf.reshape(net_out2d,[-1,time_steps,inputs_size])
 # labels=真实输出，predictions=预测输出，求误差平方和
@@ -60,8 +61,8 @@ train_op=tf.train.AdamOptimizer(lr).minimize(loss)
 
 sess=tf.Session()
 sess.run(tf.global_variables_initializer())
-# 控制子图默认间距，figsize为整数元组，提供高度和宽度
-plt.figure(1,figsize=(20,10))
+# 控制子图默认间距，1为图片名字，figsize为整数元组，提供高度和宽度
+plt.figure(1,figsize=(12,5))
 # 打开交互模式
 plt.ion()
 
@@ -79,9 +80,10 @@ for step in range(100):
     _,pred_,final_s_=sess.run([train_op,out,final_s],feed_dict)
     plt.plot(steps,y.flatten(),'r-')
     plt.plot(steps,pred_.flatten(),'b-')
-    plt.ylim(-1.2,1.2)
+    # 设置y轴限制
+    plt.ylim(-1.5,1.5)
     plt.draw()
-    plt.pause(0.05)
+    plt.pause(0.02)
 plt.ioff()
 plt.show()
 
