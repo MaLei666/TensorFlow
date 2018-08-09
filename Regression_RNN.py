@@ -23,11 +23,11 @@ x_np=np.sin(steps)
 y_np=np.cos(steps)
 # 绘制图像，‘r-’为格式化字符串[color][marker][line]
 # steps,y_np为点的坐标
-plt.plot(steps,y_np,'r-',label='target(cos)')
-plt.plot(steps,x_np,'b-',label='input(sin)')
-# 图例摆放位置，默认右上方
-plt.legend(loc='best')
-plt.show()
+# plt.plot(steps,y_np,'r-',label='target(cos)')
+# plt.plot(steps,x_np,'b-',label='input(sin)')
+# # 图例摆放位置，默认右上方
+# plt.legend(loc='best')
+# plt.show()
 
 # 设置TensorFlow占位符，dtype=float32，shape=(batch, 10, 1)
 tf_x=tf.placeholder(tf.float32,[None,time_steps,inputs_size])
@@ -61,11 +61,11 @@ train_op=tf.train.AdamOptimizer(lr).minimize(loss)
 sess=tf.Session()
 sess.run(tf.global_variables_initializer())
 # 控制子图默认间距，figsize为整数元组，提供高度和宽度
-plt.figure(1,figsize=(12,5),facecolor='r')
+plt.figure(1,figsize=(20,10))
 # 打开交互模式
 plt.ion()
 
-for step in range(60):
+for step in range(100):
     start,end=step*np.pi,(step+1)*np.pi
     steps=np.linspace(start,end,time_steps)
     x=np.sin(steps)[np.newaxis,:,np.newaxis]
