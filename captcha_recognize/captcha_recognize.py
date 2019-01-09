@@ -9,19 +9,9 @@ import tensorflow as tf
 import captcha_model as captcha
 from datetime import datetime
 import argparse
-import sys
 import numpy as np
 import config
 import os
-
-IMAGE_WIDTH = config.IMAGE_WIDTH
-IMAGE_HEIGHT = config.IMAGE_HEIGHT
-
-CHAR_SETS = config.CHAR_SETS
-CLASSES_NUM = config.CLASSES_NUM
-CHARS_NUM = config.CHARS_NUM
-
-FLAGS = None
 
 def one_hot_to_texts(recog_result):
   texts = []
@@ -31,7 +21,7 @@ def one_hot_to_texts(recog_result):
   return texts
 
 
-def input_data(image_dir):
+def input_dir_data(image_dir):
   if not gfile.Exists(image_dir):
     print(">> Image director '" + image_dir + "' not found.")
     return None
@@ -61,10 +51,24 @@ def input_data(image_dir):
     i += 1
   return images, files
 
+def input_img_data(img_data):
+  if not gfile.Exists(img_data):
+    print(">> Image '" + img_data + "' not found.")
+    return None
+  image = Image.open(img_data)
+  image_gray = image.convert('L')
+  image_resize = image_gray.resize(size=(IMAGE_WIDTH,IMAGE_HEIGHT))
+  image.close()
+  input_img = np.array(image_resize, dtype='float32')
+  input_img = np.multiply(input_img.flatten(), 1./255) - 0.5
+  return input_img
 
-def run_predict():
+
+def run_predict(img_data):
   with tf.Graph().as_default(), tf.device('/cpu:0'):
-    input_images, input_filenames = input_data(FLAGS.captcha_dir)
+    input_filenames=''
+    # input_images, input_filenames = input_dir_data(FLAGS.captcha_dir)
+    input_images = input_img_data(img_data)
     images = tf.constant(input_images)
     logits = captcha.inference(images, keep_prob=1)
     result = captcha.output(logits)
@@ -77,30 +81,36 @@ def run_predict():
     text = one_hot_to_texts(recog_result)
     total_count = len(input_filenames)
     true_count = 0.
-    for i in range(total_count):
-      print('image ' + input_filenames[i] + " recognize ----> '" + text[i] + "'")
-      if text[i] in input_filenames[i]:
-        true_count += 1
-    precision = true_count / total_count
-    print('%s true/total: %d/%d recognize @ 1 = %.3f'
-                    %(datetime.now(), true_count, total_count, precision))
+    if total_count!=0:
+      for i in range(total_count):
+        print('image ' + input_filenames[i] + " recognize ----> '" + text[i] + "'")
+        if text[i] in input_filenames[i]:
+          true_count += 1
+      precision = true_count / total_count
+      print('%s true/total: %d/%d recognize @ 1 = %.3f'
+                      %(datetime.now(), true_count, total_count, precision))
+    elif total_count==0:
+      print(text[0])
+      return text[0]
 
-def main(_):
-  run_predict()
-
-if __name__ == '__main__':
-  parser = argparse.ArgumentParser()
-  parser.add_argument(
-      '--checkpoint_dir',
-      type=str,
-      default='./captcha_train',
-      help='Directory where to restore checkpoint.'
-  )
-  parser.add_argument(
-      '--captcha_dir',
-      type=str,
-      default='./data/test_data',
-      help='Directory where to get captcha images.'
-  )
-  FLAGS, unparsed = parser.parse_known_args()
-  tf.app.run(main=main, argv=[sys.argv[0]] + unparsed)
+IMAGE_WIDTH = config.IMAGE_WIDTH
+IMAGE_HEIGHT = config.IMAGE_HEIGHT
+CHAR_SETS = config.CHAR_SETS
+CLASSES_NUM = config.CLASSES_NUM
+CHARS_NUM = config.CHARS_NUM
+FLAGS = None
+parser = argparse.ArgumentParser()
+parser.add_argument(
+    '--checkpoint_dir',
+    type=str,
+    default='./captcha_train',
+    help='Directory where to restore checkpoint.'
+)
+parser.add_argument(
+    '--captcha_dir',
+    type=str,
+    default='./data/test_data',
+    help='Directory where to get captcha images.'
+)
+FLAGS, unparsed = parser.parse_known_args()
+# run_predict('./data/test_data/1ab2s_num286.jpg')
